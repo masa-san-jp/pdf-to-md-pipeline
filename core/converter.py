@@ -69,7 +69,7 @@ def convert_folder(
   """フォルダ内のPDFをファイル名昇順で変換し、単一Markdownへ連結する。"""
   import opendataloader_pdf
 
-  pdfs = list(pdfs)
+  pdfs = sorted(list(pdfs), key=lambda p: p.name)
   if not pdfs:
     raise ValueError(f"変換対象のPDFが空です: {folder_name}")
 
