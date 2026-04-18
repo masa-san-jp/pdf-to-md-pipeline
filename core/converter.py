@@ -54,6 +54,9 @@ def convert_single(
     **_build_kwargs([str(pdf)], output_dir, hybrid, use_struct_tree)
   )
   result = output_dir / f"{pdf.stem}.md"
+  if not result.exists():
+    logger.error("変換結果が見つかりません: %s (入力: %s)", result, pdf)
+    raise FileNotFoundError(f"変換結果が生成されませんでした: {result}")
   logger.info("変換: %s → %s", pdf, result)
   return result
 
