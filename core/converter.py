@@ -82,12 +82,21 @@ def convert_folder(
       **_build_kwargs([str(p) for p in pdfs], tmp_dir, hybrid, use_struct_tree)
     )
     parts: list[str] = []
+    missing_results: list[Path] = []
     for pdf in pdfs:
       md = tmp_dir / f"{pdf.stem}.md"
       if md.exists():
         parts.append(md.read_text(encoding="utf-8"))
       else:
         logger.warning("変換結果が見つかりません: %s", md)
+        missing_results.append(md)
+
+    if missing_results:
+      missing_list = ", ".join(str(path) for path in missing_results)
+      raise FileNotFoundError(
+        f"変換結果が不足しているため連結Markdownを生成できません: "
+        f"{folder_name} ({len(missing_results)}件欠落: {missing_list})"
+      )
     final.write_text("\n\n".join(parts), encoding="utf-8")
 
   logger.info("変換: %s (%d件) → %s", folder_name, len(pdfs), final)
