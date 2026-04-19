@@ -74,13 +74,40 @@ python run.py
 
 ---
 
+## クイックスタート（クラウド版）
+
+GCP プロジェクト・Document AI プロセッサ・GCS バケットが作成済みであることを前提とします。  
+詳細は [`docs/spec-cloud.md`](./docs/spec-cloud.md) のセットアップ手順を参照してください。
+
+```bash
+# Docker イメージをビルド（project root から実行）
+docker build -f cloud/Dockerfile -t pdf-converter .
+
+# ローカル動作確認（実 GCP 認証が必要）
+docker run \
+  -e BUCKET_NAME=my-project-pdf-converter \
+  -e PROCESSOR_NAME="projects/123/locations/us/processors/abc" \
+  -e DOCAI_LOCATION=us \
+  -v ~/.config/gcloud:/root/.config/gcloud \
+  pdf-converter
+
+# Cloud Run ジョブとしてデプロイ
+gcloud builds submit --tag gcr.io/[PROJECT]/pdf-converter .
+gcloud run jobs create pdf-converter \
+  --image gcr.io/[PROJECT]/pdf-converter \
+  --region asia-northeast1 \
+  --set-env-vars BUCKET_NAME=[BUCKET],PROCESSOR_NAME=[PROCESSOR],DOCAI_LOCATION=us
+```
+
+---
+
 ## 実装状況
 
 | バリアント | 状態 |
 |---|---|
 | vol.1 ローカル版 | ✅ 実装済み（`local/`） |
 | vol.2 Colab版 | ✅ 実装済み（`colab/`） |
-| vol.3 クラウド版 | 📝 仕様書のみ |
+| vol.3 クラウド版 | ✅ 実装済み（`cloud/`） |
 
 ---
 
