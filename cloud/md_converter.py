@@ -85,15 +85,6 @@ def docai_to_markdown(doc: "documentai.Document") -> str:
     if page_idx > 0:
       sections.append("---")
 
-    for block in page.blocks:
-      block_type = ""
-      if block.layout.orientation is not None:
-        pass  # orientation は変換に不要
-
-      # block_type は layout.block_type が存在しない場合があるため paragraph から判定
-      # Document AI v1 では page.paragraphs / page.tables を別途参照する
-      pass
-
     # paragraphs
     for para in page.paragraphs:
       text = _extract_text(doc_text, para.layout)
