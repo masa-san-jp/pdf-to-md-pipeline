@@ -4,39 +4,41 @@ google-cloud-storage をモック化し、GCS API 呼び出し不要でテスト
 """
 from __future__ import annotations
 
+import importlib
 import json
 import sys
 import types
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, call, patch
+
+import pytest
 
 
 # ──────────────────────────────────────────────────────────────────────────────
 # google.cloud.storage スタブ（最小限）
 # ──────────────────────────────────────────────────────────────────────────────
 
-def _stub_storage():
+def _stub_storage(monkeypatch):
   mod = types.ModuleType("google.cloud.storage")
   mod.Client = MagicMock
   google_mod = sys.modules.get("google") or types.ModuleType("google")
   google_cloud = sys.modules.get("google.cloud") or types.ModuleType("google.cloud")
   google_mod.cloud = google_cloud
   google_cloud.storage = mod
-  sys.modules.setdefault("google", google_mod)
-  sys.modules.setdefault("google.cloud", google_cloud)
-  sys.modules["google.cloud.storage"] = mod
+  monkeypatch.setitem(sys.modules, "google", google_mod)
+  monkeypatch.setitem(sys.modules, "google.cloud", google_cloud)
+  monkeypatch.setitem(sys.modules, "google.cloud.storage", mod)
   return mod
 
 
-_stub_storage()
-
-from cloud.gcs_ops import (  # noqa: E402
-  log_result,
-  move_folder_to_done,
-  move_to_done,
-  save_markdown,
-)
-
-
+@pytest.fixture(autouse=True)
+def _stub_storage_modules(monkeypatch):
+  _stub_storage(monkeypatch)
+  module = importlib.import_module("cloud.gcs_ops")
+  module = importlib.reload(module)
+  globals()["log_result"] = module.log_result
+  globals()["move_folder_to_done"] = module.move_folder_to_done
+  globals()["move_to_done"] = module.move_to_done
+  globals()["save_markdown"] = module.save_markdown
 # ──────────────────────────────────────────────────────────────────────────────
 # ヘルパー
 # ──────────────────────────────────────────────────────────────────────────────
