@@ -62,12 +62,24 @@ python run.py
 
 ---
 
+## クイックスタート（Colab版）
+
+1. Google Drive に `pdf-to-markdown/` フォルダを作成し、`input/` サブフォルダを追加
+2. `colab/pdf_to_markdown.ipynb` をそのフォルダにアップロード
+3. ノートブックをダブルクリックして Colab で開く
+4. 「ランタイム」→「すべてのセルを実行」
+5. `output/` フォルダに Markdown ファイルが生成されます
+
+チームで使う場合は `pdf-to-markdown/` フォルダを「共有」→「編集者」権限でメンバーに共有してください。
+
+---
+
 ## 実装状況
 
 | バリアント | 状態 |
 |---|---|
 | vol.1 ローカル版 | ✅ 実装済み（`local/`） |
-| vol.2 Colab版 | 📝 仕様書のみ |
+| vol.2 Colab版 | ✅ 実装済み（`colab/`） |
 | vol.3 クラウド版 | 📝 仕様書のみ |
 
 ---

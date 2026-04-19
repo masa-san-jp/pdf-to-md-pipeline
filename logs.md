@@ -48,3 +48,32 @@
 
 - `pytest tests/ -v` → 4/4 PASS
 - `python run.py`（`opendataloader_pdf` をスタブ化した状態）で `input/ → output/ + done/` のファイル移動を確認
+
+---
+
+## 2026-04-19 — Colab版（vol.2）の実装
+
+### 実装したもの
+
+- `colab/pdf_to_markdown.ipynb`: セル1〜4で構成されるColabノートブック
+
+### 意思決定のメモ
+
+**`core/converter.py` のロジックをノートブック内にインライン展開した**  
+Colab環境では `sys.path` 操作なしにローカルの `core/` をインポートできない。ノートブックは自己完結していることが「開いてすぐ実行できる」という vol.2 の設計原則に合うため、`core/` の関数と同等のロジック（`_convert_single` / `_convert_folder` / `_move_to_done`）をセル3内に定義した。命名を `core/` と揃えることで、将来的にGitHub経由でインポートに切り替える際の差分を最小化している。
+
+**`threading.Thread` + `Popen` でhybridバックエンドを起動**  
+仕様書の `subprocess.run` はブロッキングのため、プロセスをバックグラウンドで保持するために `subprocess.Popen` に変更。`daemon=True` にすることでColabセッション終了時に自動終了する。
+
+**ログをDriveの `logs/` に保存する**  
+仕様書のフォルダ構成に `logs/` があるため、実行ごとにタイムスタンプ付きログファイルを生成する。`StreamHandler` も同時設定してセル出力にも表示。
+
+**`tempfile.TemporaryDirectory` で中間ファイルを管理**  
+仕様書の実装例では `/content/tmp_{stem}` に直接書き出していたが、`with` ブロックで自動削除される `tempfile.TemporaryDirectory` に変更した。Colabの `/content` は揮発性なので残留ゴミを防ぐ。
+
+**`input/` が空の場合を明示的にハンドリング**  
+空ディレクトリで `sorted(INPUT_DIR.iterdir())` を実行しても無害だが、ユーザーへの通知として `⚠️` メッセージを表示する。
+
+### 未確定事項の扱い
+
+`docs/spec-colab.md` 末尾の `[ ]` リストは未解決のまま（Driveの共有方法、Colab Pro契約有無、バージョン管理方法）。ノートブック自体はどちらの構成でも動作するため、今回は判断を求めない実装とした。
