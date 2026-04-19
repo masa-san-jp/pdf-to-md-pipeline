@@ -47,8 +47,6 @@ def _is_folder_prefix(key: str) -> bool:
 
 def _list_folder_pdfs(bucket, folder_prefix: str) -> list[str]:
   """フォルダ内の PDF キーをファイル名昇順で返す。"""
-  from google.cloud import storage as gcs_module  # noqa: PLC0415
-
   blobs = list(bucket.client.list_blobs(bucket, prefix=folder_prefix))
   keys = sorted(
     [b.name for b in blobs if b.name.lower().endswith(".pdf")],
