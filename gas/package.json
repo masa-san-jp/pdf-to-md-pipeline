@@ -1,0 +1,14 @@
+{
+  "name": "google-drive-ocr-pipeline",
+  "version": "1.0.0",
+  "description": "Google Drive + Gemini API で任意のドキュメントをMarkdown形式のGoogle Docに変換するパイプライン",
+  "scripts": {
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^30.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
+}

@@ -1,6 +1,6 @@
 # pdf-to-md-pipeline
 
-PDFをMarkdownに変換するパイプライン。環境・用途に応じて3つのバリアントから選べます。
+PDFや画像をMarkdownに変換するパイプライン。環境・用途に応じて4つのバリアントから選べます。
 
 ---
 
@@ -15,21 +15,26 @@ PCを選ばずブラウザだけで使いたい、またはチームで手軽に
 
 完全自動化・大量処理・サーバー管理不要にしたい？（GCPアカウント必須）
     → YES → cloud/（クラウド版）
+
+Google Drive にファイルを置くだけで自動変換したい？画像も扱いたい？
+    → YES → gas/（Google Apps Script版）
 ```
 
 ---
 
 ## バリアント比較
 
-| | [local/](./local/) | [colab/](./colab/) | [cloud/](./cloud/) |
-|---|---|---|---|
-| **実行環境** | Linux / macOS / Windows | ブラウザ（Google Colab） | Google Cloud Platform |
-| **セットアップ** | Python + Java のインストール | Googleアカウントのみ | GCPプロジェクト + IAM設定 |
-| **スキャンPDF対応** | ✅ ローカルOCR | ✅ ローカルOCR（Colabランタイム） | ✅ Document AI OCR |
-| **定期自動実行** | ✅ systemd / タスクスケジューラ | △ Colab Pro+ のみ | ✅ Cloud Scheduler |
-| **共同作業** | ❌（ローカル完結） | ✅ Google Drive共有 | ✅ GCS共有 |
-| **コスト** | 無料（電気代のみ） | 無料（Pro+は月約2,700円） | 約$2/月〜 |
-| **データ保管場所** | ローカルマシン | Google Drive | Google Cloud Storage |
+| | [local/](./local/) | [colab/](./colab/) | [cloud/](./cloud/) | [gas/](./gas/) |
+|---|---|---|---|---|
+| **実行環境** | Linux / macOS / Windows | ブラウザ（Google Colab） | Google Cloud Platform | Google Apps Script |
+| **セットアップ** | Python + Java のインストール | Googleアカウントのみ | GCPプロジェクト + IAM設定 | Googleアカウント + Gemini APIキー |
+| **対応形式** | PDF | PDF | PDF | PDF + 画像（JPEG / PNG / HEIC 等） |
+| **スキャンPDF対応** | ✅ ローカルOCR | ✅ ローカルOCR（Colabランタイム） | ✅ Document AI OCR | ✅ Gemini Vision OCR |
+| **出力形式** | Markdown ファイル | Markdown ファイル | Markdown ファイル | Google Doc（Markdown本文） |
+| **定期自動実行** | ✅ systemd / タスクスケジューラ | △ Colab Pro+ のみ | ✅ Cloud Scheduler | ✅ タイムドリガー（10分ごと） |
+| **共同作業** | ❌（ローカル完結） | ✅ Google Drive共有 | ✅ GCS共有 | ✅ Google Drive共有 |
+| **コスト** | 無料（電気代のみ） | 無料（Pro+は月約2,700円） | 約$2/月〜 | 無料枠内〜（Gemini API従量） |
+| **データ保管場所** | ローカルマシン | Google Drive | Google Cloud Storage | Google Drive |
 
 ---
 
@@ -108,6 +113,19 @@ gcloud run jobs create pdf-converter \
 | vol.1 ローカル版 | ✅ 実装済み（`local/`） |
 | vol.2 Colab版 | ✅ 実装済み（`colab/`） |
 | vol.3 クラウド版 | ✅ 実装済み（`cloud/`） |
+| vol.4 GAS版 | ✅ 実装済み（`gas/`） |
+
+---
+
+## クイックスタート（GAS版）
+
+1. Google Drive に `ocr-input` / `ocr-processed` / `ocr-error` / `ocr-output` フォルダを作成
+2. [script.google.com](https://script.google.com) で新プロジェクトを作成し、`gas/src/` の4ファイルを貼り付け
+3. スクリプトプロパティに `GEMINI_API_KEY` と4つのフォルダ ID を設定
+4. `processDocuments` 関数に10分ごとのタイムドリガーを設定
+5. `ocr-input/` にファイルを置くと `ocr-output/` に Google Doc が自動生成されます
+
+詳細は [`gas/README.md`](./gas/README.md) を参照してください。
 
 ---
 
