@@ -62,6 +62,31 @@ python run.py
 
 ---
 
+## クイックスタート（クラウド版）
+
+GCP プロジェクトと `gcloud` CLI が必要です。
+
+```bash
+# 1. セットアップ（初回のみ）
+cd cloud
+chmod +x setup.sh
+./setup.sh your-gcp-project-id
+
+# 2. PDF をアップロード
+gsutil cp ~/Downloads/sample.pdf gs://your-gcp-project-id-pdf-converter/input/
+
+# 3. 手動実行（Cloud Scheduler が自動実行するまで待てない場合）
+gcloud run jobs execute pdf-converter --region=asia-northeast1 --project=your-gcp-project-id
+
+# 4. 結果を確認
+gsutil ls gs://your-gcp-project-id-pdf-converter/output/
+gsutil cat gs://your-gcp-project-id-pdf-converter/output/sample.md
+```
+
+Cloud Scheduler が設定されると **毎時 0 分に自動実行** されます。コストの目安は月約 $2〜（詳細は [`docs/spec-cloud.md`](./docs/spec-cloud.md) §9 を参照）。
+
+---
+
 ## クイックスタート（Colab版）
 
 1. Google Drive に `pdf-to-markdown/` フォルダを作成し、`input/` サブフォルダを追加
@@ -80,7 +105,7 @@ python run.py
 |---|---|
 | vol.1 ローカル版 | ✅ 実装済み（`local/`） |
 | vol.2 Colab版 | ✅ 実装済み（`colab/`） |
-| vol.3 クラウド版 | 📝 仕様書のみ |
+| vol.3 クラウド版 | ✅ 実装済み（`cloud/`） |
 
 ---
 
